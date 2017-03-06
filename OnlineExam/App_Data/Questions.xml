@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Questions>
+  <Question>
+    <Content>汽車在隧道內行駛時:</Content>
+    <Answer>應開亮頭燈並依規定速限行駛</Answer>
+    <Options>
+      <option>不得開燈</option>
+      <option>開燈快行</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>夜間跟隨前車行駛之車輛:</Content>
+    <Answer>用近光燈</Answer>
+    <Options>
+      <option>用遠光燈</option>
+      <option>不必開燈</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>汽車駕駛人最重要的是:</Content>
+    <Answer>要有重視人命的道德觀念</Answer>
+    <Options>
+      <option>為趕時間可開快車</option>
+      <option>注意沿路風景</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>汽車在夜間行經市區照明情況良好處應該:</Content>
+    <Answer>開近光燈</Answer>
+    <Options>
+      <option>開遠光燈</option>
+      <option>多鳴喇叭</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>乘客遺留財物在車上，應:</Content>
+    <Answer>送交附近警察機關招領</Answer>
+    <Options>
+      <option>據為己有</option>
+      <option>捐贈公益團體</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>汽車油箱加油時:</Content>
+    <Answer>引擎必須先熄火</Answer>
+    <Options>
+      <option>引擎不必熄火</option>
+      <option>引擎熄火不熄火都無所謂</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>汽車駕駛人應:</Content>
+    <Answer>保持安全第一</Answer>
+    <Options>
+      <option>僅注意技術</option>
+      <option>為達成任務要不眠不休</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>跟前車行到鐵路平交道前應該:</Content>
+    <Answer>減速慢行與前車保持適當距離</Answer>
+    <Options>
+      <option>與平常一樣行駛</option>
+      <option>加速通過平交道</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>汽車駕駛人要確保自己和他人的安全應:</Content>
+    <Answer>克制自己，幫助他人</Answer>
+    <Options>
+      <option>防止他人逞強</option>
+      <option>想法子對付他人</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>在狹路與他車交會時應：</Content>
+    <Answer>預先估計有足夠位置儘量靠邊停讓他車先行</Answer>
+    <Options>
+      <option>搶先前進迫使對方讓路</option>
+      <option>大鳴喇叭，警告對方避讓</option>
+    </Options>
+  </Question>
+  
+  <Question>
+    <Content>遇老弱婦孺身心障礙者乘搭客車時應：</Content>
+    <Answer>待全部上車坐穩後再行開車</Answer>
+    <Options>
+      <option>婉拒乘載</option>
+      <option>加倍收費</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>雨天行車通過泥濘道路，輪胎發生打滑現象，你應該：</Content>
+    <Answer>變換低速檔，雙手緊握方向盤，注意車尾滑向，往同方向適度操作方向盤</Answer>
+    <Options>
+      <option>馬上踩煞車減速</option>
+      <option>踩油門加速通過</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>行車中，發覺煞車失靈應：</Content>
+    <Answer>立即變換低速檔，並亮右側方向燈，作靠邊停車準備</Answer>
+    <Options>
+      <option>立即向路旁停靠</option>
+      <option>開亮車頭燈，並鳴喇叭，促使前方人車注意避讓</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>在那種情形下，車輛可從公路行車分向線左邊行駛：</Content>
+    <Answer>當道路右側停有車輛或障礙物而對向又無來車時</Answer>
+    <Options>
+      <option>上下坡時</option>
+      <option>準備停車時</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>夜間行車交會，對方不變換近光燈時，應如何處理：</Content>
+    <Answer>不和對方一般見識以近光燈減速行駛</Answer>
+    <Options>
+      <option>以眼還眼，也用遠光燈報復</option>
+      <option>無所謂</option>
+    </Options>
+  </Question>
+  
+  <Question>
+    <Content>汽車行駛於長隧道內：</Content>
+    <Answer>不可以任意變換車道</Answer>
+    <Options>
+      <option>可以任意變換車道</option>
+      <option>若因車道壅塞，可以變換至車輛較少之車道</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>汽車行駛於長隧道遇前方火災發生時，其逃生原則：</Content>
+    <Answer>依車行反方向逃生</Answer>
+    <Options>
+      <option>留在車內等待救援</option>
+      <option>依車行方向逃生</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>小貨車必須附載隨車作業人員者，除駕駛人外，不得超過：</Content>
+    <Answer>2人</Answer>
+    <Options>
+      <option>1人</option>
+      <option>3人</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>學習駕駛證，以學習什麼車為限?</Content>
+    <Answer>小型車</Answer>
+    <Options>
+      <option>大貨車</option>
+      <option>大客車</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>領有普通駕照，駕駛營業車輛營業者是:</Content>
+    <Answer>違規的行為</Answer>
+    <Options>
+      <option>合法的行為</option>
+      <option>法規並無限制</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>駕駛執照遺失後應:</Content>
+    <Answer>向公路監理機關申請補發</Answer>
+    <Options>
+      <option>重新考領駕照</option>
+      <option>登報作廢即可</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>申請汽車學習駕駛證，須年滿:</Content>
+    <Answer>18歲</Answer>
+    <Options>
+      <option>16歲</option>
+      <option>20歲</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>申請報考職業駕駛執照，最高年齡不得超過:</Content>
+    <Answer>65歲</Answer>
+    <Options>
+      <option>45歲</option>
+      <option>55歲</option>
+    </Options>
+  </Question>
+
+  <Question>
+    <Content>應考小型車普通駕駛執照者，須有學習駕駛多少時間之經歷:</Content>
+    <Answer>3個月以上</Answer>
+    <Options>
+      <option>2個月以上</option>
+      <option>6個月以上</option>
+    </Options>
+  </Question>
+
+
+
+</Questions>

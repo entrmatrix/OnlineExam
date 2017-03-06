@@ -1,0 +1,64 @@
+﻿@model OnlineExam.Models.Exam
+@{
+    ViewBag.Title = "新測驗";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>@Model.Title</h2>
+    </div>
+    <div class="col-md-4">
+        @if (Model.Score.HasValue)
+        {
+            <h2>
+                您的分數是：@Model.Score 分
+            </h2>
+        }
+       
+
+    </div>
+
+    <div>
+       
+   </div>
+
+</div>
+
+<form method="post" action="/Exam/Store" class="form-horizontal">
+
+    @foreach (var question in Model.ExamQuestions)
+    {
+        <div class="form-group form-inline question">
+
+            @question.Order    <span>. @question.Content</span>
+
+            @foreach (var option in question.Options)
+            {
+                var optionText = String.Format("{0}.{1}", option.Key, option.Text);
+                //var name = String.Format("answer-{0}", question.Order);
+
+                <div class="radio radio-info">
+
+                    <input type="radio" name="answer-@question.Order" value="@option.Key">
+
+                    <label>@optionText </label>
+
+                </div>
+
+
+            }
+
+        </div>
+
+    }
+
+    <div class="form-group">
+
+        <input type="hidden" name="Id" value="@Model.Id" />
+
+        <button id="btnSubmit" type="submit" class="btn btn-success" style="font-size:17px">交券</button>
+    </div>
+
+
+
+</form>
