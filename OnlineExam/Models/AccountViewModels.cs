@@ -64,6 +64,14 @@ namespace OnlineExam.Models
 
     public class RegisterViewModel
     {
+        [Required(ErrorMessage ="請填寫姓名")]
+        [Display(Name = "姓名")]
+        public string Name { get; set; }
+
+
+        [Display(Name = "性別")]
+        public bool Gender { get; set; }
+
         [Required]
         [EmailAddress]
         [Display(Name = "電子郵件")]

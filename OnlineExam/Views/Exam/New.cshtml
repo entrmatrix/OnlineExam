@@ -1,64 +1,159 @@
 ﻿@model OnlineExam.Models.Exam
 @{
-    ViewBag.Title = "新測驗";
+    ViewBag.Title = "新測驗";   
 }
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>@Model.Title</h2>
-    </div>
-    <div class="col-md-4">
-        @if (Model.Score.HasValue)
-        {
-            <h2>
-                您的分數是：@Model.Score 分
-            </h2>
-        }
-       
-
-    </div>
-
-    <div>
-       
-   </div>
-
-</div>
-
-<form method="post" action="/Exam/Store" class="form-horizontal">
-
-    @foreach (var question in Model.ExamQuestions)
+@helper scoreWithColor(double score)
+{
+    var color = "green";
+    if (score < 60)
     {
-        <div class="form-group form-inline question">
+        color = "red";
+    }
 
-            @question.Order    <span>. @question.Content</span>
+    <span id="score" style="color:@color">@score</span>
+}
 
-            @foreach (var option in question.Options)
+<div id="divExam">
+
+    <div class="row">
+        <div class="col-md-4">
+            <h2>@Model.Title</h2>
+        </div>
+        <div id="divScore" class="col-md-4" >
+            @if (Model.Score.HasValue)
             {
-                var optionText = String.Format("{0}.{1}", option.Key, option.Text);
-                //var name = String.Format("answer-{0}", question.Order);
+                <h2>
+                    您的分數是： @scoreWithColor((double)Model.Score) 分
+                </h2>
+            }
+        </div>
 
-                <div class="radio radio-info">
+        <div>
 
-                    <input type="radio" name="answer-@question.Order" value="@option.Key">
+        </div>
 
-                    <label>@optionText </label>
+    </div>   
 
-                </div>
+    @{
+
+        var ajaxOptions = new AjaxOptions
+        {
+            OnBegin="Loading",
+            OnComplete= "EndLoading",
+            OnFailure = "failedStoreExam",
+            UpdateTargetId = "divExam",
+            InsertionMode=InsertionMode.ReplaceWith
+        };
+
+        var htmlAttributes = new { id = "formExam" };
+
+    }
+
+    @using (Ajax.BeginForm("Store", "Exam", null, ajaxOptions , htmlAttributes ))
+    {
+
+        foreach (var question in Model.ExamQuestions)
+        {
+            <div class="form-group form-inline question">
+
+                @if (question.Points == 0)
+                {
+                    <span style="color:red" class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    <span style="color:red">正確答案：@question.CorrectOption</span>
+                }
 
 
+                @question.Order    <span>. @question.Content</span>
+
+                @foreach (var option in question.Options)
+                {
+                    var name = String.Format("answer-{0}", question.Order);
+                    var optionText = String.Format("{0}.{1}", option.Key, option.Text);
+
+                    <div class="radio radio-info q-option">
+                        @if (option.Key == question.UserAnswer)
+                        {
+                            <input type="radio" name="@name" value="@option.Key" checked>
+                        }
+                        else
+                        {
+                            <input type="radio" name="@name" value="@option.Key">
+                        }
+
+                        <label>@optionText </label>
+
+                    </div>
+
+
+                }
+
+            </div>
+
+        }
+
+        <div class="form-group">
+
+            <input type="hidden" name="Id" value="@Model.Id" />
+
+            @if (!Model.Score.HasValue)
+            {
+                <button id="btnSubmit" type="submit" class="btn btn-success" style="font-size:17px">交券</button>
+            }
+            else
+            {
+                <a href="@Url.Action("New","Exam")" class="btn btn-info">開始新測驗</a>
             }
 
+           
         </div>
 
     }
 
-    <div class="form-group">
+    @if (Model.Score.HasValue)
+    {
+        <script type="text/javascript">
+            init();
+        </script>
+    }
+  
+</div>
 
-        <input type="hidden" name="Id" value="@Model.Id" />
-
-        <button id="btnSubmit" type="submit" class="btn btn-success" style="font-size:17px">交券</button>
-    </div>
 
 
 
-</form>
+@section scripts{
+    <script type="text/javascript">
+        
+
+    function init() {
+
+        $('.q-option').click(function () {
+            var option = $(this).children(':first');
+            option.prop('checked', 'true');
+        })
+
+        if ($('#score').length) {
+            //有分數,已評分
+            $('#formExam input:radio').attr('disabled', 'true');
+        }
+    }
+
+    function failedStoreExam() {
+        alert('儲存資料失敗');
+    }
+
+    
+    $(document).ready(function () {
+      
+        init();
+        
+
+    })
+
+   
+
+</script>
+    
+}
+

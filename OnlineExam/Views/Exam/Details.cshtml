@@ -1,0 +1,106 @@
+﻿@model OnlineExam.Models.Exam
+@{
+    ViewBag.Title = "測驗回顧";
+}
+
+@helper scoreWithColor(double score)
+{
+var color = "green";
+if (score < 60)
+{
+    color = "red";
+}
+
+    <span id="score" style="color:@color">@score</span>
+}
+
+<div id="divExam">
+
+    <div class="row">
+        <div class="col-md-3">
+            <h2>測驗回顧</h2>
+        </div>
+        <div id="divScore" class="col-md-4">
+            <h2>
+                您的分數是： @scoreWithColor((double)Model.Score) 分
+            </h2>
+        </div>
+
+        <div>
+            <h2>測驗日期：@Model.ExamDate.ToString("yyyy/MM/dd HH:mm:ss")</h2>
+        </div>
+
+    </div>
+
+
+        @foreach (var question in Model.ExamQuestions)
+        {
+            <div class="form-group form-inline question">
+
+                @if (question.Points == 0)
+                {
+                    <span style="color:red" class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    <span style="color:red">正確答案：@question.CorrectOption</span>
+                }
+
+
+                @question.Order    <span>. @question.Content</span>
+
+                @foreach (var option in question.Options)
+                {
+                    var name = String.Format("answer-{0}", question.Order);
+                    var optionText = String.Format("{0}.{1}", option.Key, option.Text);
+
+                    <div class="radio radio-info q-option">
+                        @if (option.Key == question.UserAnswer)
+                        {
+                            <input type="radio" name="@name" value="@option.Key" checked>
+                        }
+                        else
+                        {
+                            <input type="radio" name="@name" value="@option.Key">
+                        }
+
+                        <label>@optionText </label>
+
+                    </div>
+
+
+                }
+
+            </div>
+
+        }
+
+        <div class="form-group">
+
+       
+            <a href="@Url.Action("Index","Exam")" class="btn btn-default">返回</a>
+    
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            <a href="@Url.Action("New","Exam")" class="btn btn-info">開始新測驗</a>
+
+
+        </div>
+
+
+</div>
+
+
+
+
+@section scripts{
+    <script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#divExam input:radio').attr('disabled', 'true');
+
+
+    })
+
+    </script>
+
+}
+

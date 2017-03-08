@@ -32,9 +32,9 @@ namespace OnlineExam.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -61,6 +61,7 @@ namespace OnlineExam.Controllers
                 : message == ManageMessageId.Error ? "發生錯誤。"
                 : message == ManageMessageId.AddPhoneSuccess ? "已新增您的電話號碼。"
                 : message == ManageMessageId.RemovePhoneSuccess ? "已移除您的電話號碼。"
+                : message==ManageMessageId.UpdateProfileSuccess ? "更新個人資料成功"
                 : "";
 
             var userId = User.Identity.GetUserId();
@@ -72,8 +73,49 @@ namespace OnlineExam.Controllers
                 Logins = await UserManager.GetLoginsAsync(userId),
                 BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
             };
+            return View("Manage", model);
+        }
+
+        [HttpGet]
+        public ActionResult Profiles()
+        {
+            var userId = User.Identity.GetUserId();
+            var user = UserManager.FindById(userId);
+
+            var model = new RegisterViewModel
+            {
+                Name = user.Name,
+                Gender = user.Gender
+            };
+
             return View(model);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Profiles(RegisterViewModel model)
+        {
+             var user=  UserManager.FindByName(User.Identity.Name);
+             user.Name = model.Name;
+             user.Gender = model.Gender;
+
+            var result = UserManager.Update(user);
+
+            ManageMessageId? message;
+
+            if (result.Succeeded)
+            {
+                message = ManageMessageId.UpdateProfileSuccess;
+            }
+            else
+            {
+                message = ManageMessageId.Error;
+            }
+
+            return RedirectToAction("Index", new { Message = message });
+
+        }
+
 
         //
         // POST: /Manage/RemoveLogin
@@ -333,7 +375,7 @@ namespace OnlineExam.Controllers
             base.Dispose(disposing);
         }
 
-#region Helper
+        #region Helper
         // 新增外部登入時用來當做 XSRF 保護
         private const string XsrfKey = "XsrfId";
 
@@ -381,9 +423,10 @@ namespace OnlineExam.Controllers
             SetPasswordSuccess,
             RemoveLoginSuccess,
             RemovePhoneSuccess,
+            UpdateProfileSuccess,
             Error
         }
 
-#endregion
+        #endregion
     }
 }

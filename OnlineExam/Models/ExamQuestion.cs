@@ -8,7 +8,7 @@ namespace OnlineExam.Models
     public class ExamQuestion
     {
         public int Id { get; set; }
-        public int ExanId { get; set; }
+        public int ExamId { get; set; }
 
         public int Order { get; set; }
         public string Content { get; set; }

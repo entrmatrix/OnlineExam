@@ -10,12 +10,13 @@ namespace OnlineExam.Models
         public int Id { get; set; }
         public string Title { get; set; }
         public DateTime ExamDate { get; set; }
-
         public double? Score { get; set; }
+
+        public string UserId { get; set; }
 
         public virtual ICollection<ExamQuestion> ExamQuestions { get; set; }
 
-
+        public virtual ApplicationUser User { get; set; }
 
     }
 

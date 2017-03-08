@@ -49,6 +49,22 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SendGrid, Version=9.0.12.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sendgrid.9.0.12\lib\net452\SendGrid.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -112,9 +128,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -186,6 +199,18 @@
     <Compile Include="Migrations\201703060639319_20170306_3.Designer.cs">
       <DependentUpon>201703060639319_20170306_3.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201703061230344_20170306_6.cs" />
+    <Compile Include="Migrations\201703061230344_20170306_6.Designer.cs">
+      <DependentUpon>201703061230344_20170306_6.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703080249366_20170308_1.cs" />
+    <Compile Include="Migrations\201703080249366_20170308_1.Designer.cs">
+      <DependentUpon>201703080249366_20170308_1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703080522568_20170308_2.cs" />
+    <Compile Include="Migrations\201703080522568_20170308_2.Designer.cs">
+      <DependentUpon>201703080522568_20170308_2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Exam.cs" />
@@ -196,6 +221,9 @@
     <Compile Include="Models\Option.cs" />
     <Compile Include="Models\Question.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ExamService.cs" />
+    <Compile Include="Services\Extensions.cs" />
+    <Compile Include="Services\SendGridEmailService.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +231,7 @@
     <Content Include="Content\bootstrap-lumen.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\PagedList.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -212,10 +241,26 @@
     <EmbeddedResource Include="Migrations\201703060639319_20170306_3.resx">
       <DependentUpon>201703060639319_20170306_3.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703061230344_20170306_6.resx">
+      <DependentUpon>201703061230344_20170306_6.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703080249366_20170308_1.resx">
+      <DependentUpon>201703080249366_20170308_1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703080522568_20170308_2.resx">
+      <DependentUpon>201703080522568_20170308_2.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\PublishProfiles\online-exam - FTP %282%29.pubxml" />
+    <None Include="Properties\PublishProfiles\online-exam - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\online-exam - Web Deploy %282%29.pubxml" />
+    <None Include="Properties\PublishProfiles\online-exam - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.isloading.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -223,8 +268,14 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\site.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Views\Shared\EmailTemplates\PasswordMail.html" />
+    <Content Include="Views\Shared\EmailTemplates\RegisterMail.html" />
+    <Content Include="Views\Shared\EmailTemplates\RegisterMailText.txt" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -260,6 +311,10 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Shared\_Navbar.cshtml" />
     <Content Include="Views\Exam\New.cshtml" />
+    <Content Include="Views\Exam\Index.cshtml" />
+    <Content Include="Views\Exam\Details.cshtml" />
+    <Content Include="Views\Manage\Manage.cshtml" />
+    <Content Include="Views\Manage\Profiles.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

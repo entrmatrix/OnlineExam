@@ -1,0 +1,96 @@
+﻿@using PagedList.Mvc
+
+@model PagedList.IPagedList<OnlineExam.Models.Exam>
+
+@{
+    ViewBag.Title = "測驗紀錄";
+}
+
+@helper scoreWithColor(double score)
+{
+
+    if (score < 0)
+    {
+            <span id="score">--</span>
+    }
+    else
+    {
+
+        var color = "green";
+        if (score < 60)
+        {
+            color = "red";
+        }
+
+        <span id="score" style="color:@color">@score</span>
+    }
+}
+
+
+<div class="row">
+
+    <div class="col-md-3">
+        <h2>
+            測驗紀錄共 @ViewBag.Count  筆
+        </h2>
+    </div>
+    <div>
+        <h2>
+            平均分數  @scoreWithColor(ViewBag.Average) 分
+        </h2>
+    </div>
+
+</div>
+
+@if (Model != null)
+{
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th width="50px"></th>
+                <th>#</th>
+                <th>分數</th>
+                <th>測驗時間</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                int order = i + 1;
+                var color = "green";
+                if ((double)Model[i].Score < 60)
+                {
+                    color = "red";
+                }
+
+                <tr>
+                    <td>
+                        <a class="btn btn-xs btn-info" href="@Url.Action("Details",new { id=Model[i].Id })">
+                            <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+                        </a>
+                    </td>
+                    <th scope="row">@order</th>
+
+                    <td style="color:@color"> @Model[i].Score</td>
+
+                    <td> @Model[i].ExamDate.ToString("yyyy/MM/dd HH:mm::ss") </td>
+
+                </tr>
+            }
+
+
+
+        </tbody>
+
+
+    </table>
+
+
+    <br />
+
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+
+}
+
+

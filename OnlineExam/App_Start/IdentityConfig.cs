@@ -14,15 +14,7 @@ using OnlineExam.Models;
 
 namespace OnlineExam
 {
-    public class EmailService : IIdentityMessageService
-    {
-        public Task SendAsync(IdentityMessage message)
-        {
-            // 將您的電子郵件服務外掛到這裡以傳送電子郵件。
-            return Task.FromResult(0);
-        }
-    }
-
+    
     public class SmsService : IIdentityMessageService
     {
         public Task SendAsync(IdentityMessage message)
@@ -54,14 +46,14 @@ namespace OnlineExam
             manager.PasswordValidator = new PasswordValidator
             {
                 RequiredLength = 6,
-                RequireNonLetterOrDigit = true,
-                RequireDigit = true,
-                RequireLowercase = true,
-                RequireUppercase = true,
+                RequireNonLetterOrDigit = false,
+                RequireDigit = false,
+                RequireLowercase = false,
+                RequireUppercase = false,
             };
 
             // 設定使用者鎖定詳細資料
-            manager.UserLockoutEnabledByDefault = true;
+            manager.UserLockoutEnabledByDefault = false;
             manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromMinutes(5);
             manager.MaxFailedAccessAttemptsBeforeLockout = 5;
 
@@ -76,8 +68,8 @@ namespace OnlineExam
                 Subject = "安全碼",
                 BodyFormat = "您的安全碼為 {0}"
             });
-            manager.EmailService = new EmailService();
-            manager.SmsService = new SmsService();
+            //manager.EmailService = new EmailService();
+            //manager.SmsService = new SmsService();
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {

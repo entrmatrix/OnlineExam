@@ -9,6 +9,10 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using OnlineExam.Models;
+using OnlineExam.Services;
+using System.Configuration;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace OnlineExam.Controllers
 {
@@ -18,8 +22,14 @@ namespace OnlineExam.Controllers
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
+        private SendGridEmailService emailService;
+
         public AccountController()
         {
+            string sendGridApiKey= ConfigurationManager.AppSettings["sendGridApiKey"];
+            string sender = "service@online-exam.com";
+            string senderName = ConfigurationManager.AppSettings["siteName"];
+            this.emailService = new SendGridEmailService(sendGridApiKey, sender, senderName);
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
@@ -139,7 +149,9 @@ namespace OnlineExam.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            return View();
+            var model = new RegisterViewModel();
+            model.Gender = true;
+            return View(model);
         }
 
         //
@@ -152,16 +164,16 @@ namespace OnlineExam.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                user.Name = model.Name;
+                user.Gender = model.Gender;
+
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-                    // 如需如何啟用帳戶確認和密碼重設的詳細資訊，請造訪 http://go.microsoft.com/fwlink/?LinkID=320771
-                    // 傳送包含此連結的電子郵件
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "確認您的帳戶", "請按一下此連結確認您的帳戶 <a href=\"" + callbackUrl + "\">這裏</a>");
+
+                    //發送Email認證信
+                    await SendRegisterConfirmEmail(user);
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -171,6 +183,87 @@ namespace OnlineExam.Controllers
             // 如果執行到這裡，發生某項失敗，則重新顯示表單
             return View(model);
         }
+
+        async Task SendRegisterConfirmEmail(ApplicationUser user)
+        {
+            string siteName = ConfigurationManager.AppSettings["siteName"];
+            string title = String.Format("{0} 會員註冊Email認證信" , siteName);
+            string subject = title;
+            string nickName = user.Name;
+
+            string emailTemplate = System.IO.File.ReadAllText(Server.MapPath("~/Views/Shared/EmailTemplates/RegisterMail.html"));
+
+            string userId = user.Id;
+            string code = UserManager.GenerateEmailConfirmationToken(userId);
+            var validateUrl = Url.Action("RegisterConfirm", "Account", new { user = userId, code = code }, protocol: Request.Url.Scheme);
+
+            string htmlBody = emailTemplate.Replace("{{TitleText}}", title).Replace("{{UserName}}", nickName)
+                                                        .Replace("{{ValidateUrl}}", validateUrl);
+
+            string textTemplate = System.IO.File.ReadAllText(Server.MapPath("~/Views/Shared/EmailTemplates/RegisterMailText.txt"));
+
+            string textBody = textTemplate.Replace("{{TitleText}}", title).Replace("{{UserName}}", nickName)
+                                                        .Replace("{{ValidateUrl}}", validateUrl);
+
+            string to = user.Email;
+           
+            await emailService.SendAsync(subject, to, htmlBody, textBody);
+        }
+
+        //public async Task<ActionResult> RegisterConfirm(string user, string code)
+        //{
+        //    try
+        //    {
+        //        string userId = user;
+        //        if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(code))
+        //        {
+        //            return HttpNotFound();
+        //        }
+
+        //        AppUser newUser = await UserManager.FindByIdAsync(userId);
+        //        if (newUser == null)
+        //        {
+        //            return HttpNotFound();
+        //        }
+
+        //        if (!newUser.EmailConfirmed)
+        //        {
+        //            var result = await UserManager.ConfirmEmailAsync(userId, code);
+        //            if (!result.Succeeded)
+        //            {
+        //                //無效的驗證碼
+        //                var modelConfirmFailed = new RegisterConfirmModel
+        //                {
+        //                    ConfirmOK = false,
+        //                    UserId = userId
+        //                };
+
+        //                return View(modelConfirmFailed);
+        //            }
+        //        }
+
+
+        //        //驗證成功
+        //        var modelConfirmSuccess = new RegisterConfirmModel
+        //        {
+        //            ConfirmOK = true,
+        //            UserId = userId,
+        //            NickName = userId
+        //        };
+
+        //        return View(modelConfirmSuccess);
+
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        HandleException(ex);
+        //        return ErrorPage();
+        //    }
+
+
+        //}
+
 
         //
         // GET: /Account/ConfirmEmail
