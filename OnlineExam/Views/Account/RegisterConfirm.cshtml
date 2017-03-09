@@ -1,0 +1,72 @@
+﻿@model OnlineExam.Models.ApplicationUser
+
+
+@if (Model.EmailConfirmed)
+{
+    <h1 class="text-success"><span class="glyphicon glyphicon-ok-sign"></span>您已通過Email驗證. 歡迎您成為本站會員~</h1>
+
+    <h5 style="line-height:2">
+        系統將在<span class="text-danger countsec"></span>後自動跳轉回首頁
+
+
+        @Html.ActionLink("(如無自動跳轉請點此返回首頁)", "Index", "Home")
+    </h5>
+
+
+    @section scripts{
+        <script>
+            $(document).ready(function () {
+
+                setInterval(function () { myTimer() }, 1000);
+                var count = 10;
+                function myTimer() {
+                    if (count > 1) {
+                        count--;
+                        var str = count.toString() + "秒";
+                        $(".countsec").html(str);
+                    } else {
+                        window.location.assign('@Url.Action("Index", "Home")');
+                    }
+                }
+            })//end ready
+
+
+        </script>
+    }
+
+
+}
+else
+{
+
+  
+
+    <h3 class="text-danger"><span class="glyphicon glyphicon-remove-circle"></span> 驗證失敗.(驗證碼錯誤或已經過期)</h3>
+
+    <p></p>
+    <p>
+
+        @using (Html.BeginForm("SendRegisterConfirmMail", "Account", FormMethod.Post, new { @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.Id)
+
+            <button type="submit"  class="btn btn-primary">重發認證信</button>
+
+            @Html.ValidationSummary(true)
+
+        }
+
+    </p>
+
+
+  
+
+}
+
+
+
+
+
+
+

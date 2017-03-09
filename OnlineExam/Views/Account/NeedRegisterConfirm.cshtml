@@ -1,0 +1,38 @@
+﻿@model OnlineExam.Models.ApplicationUser
+
+@{
+    ViewBag.Title = "會員Email驗證";
+}
+
+<div class="container">
+    <div class="col-md-9">
+
+        <div>
+            <h3 style="line-height:2">@Model.Name 您好,</h3>
+            <h5 style="line-height:2">
+                您的會員帳號尚未完成Email認證.
+                請至您註冊的電子信箱 @Model.Email 開啟我們mail給您的會員認證信來完成認證.
+            </h5>
+
+
+            <span class="text-danger"> ※您必須完成Email認證才可開通會員權限</span>
+            <p></p>
+            <p>
+
+                @using (Html.BeginForm("SendRegisterConfirmMail", "Account", FormMethod.Post, new { @class = "form-horizontal"}))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Id)
+
+                    <button type="submit"  class="btn btn-primary">重發認證信</button>
+
+                    @Html.ValidationSummary(true)
+
+                }
+
+            </p>
+
+        </div>
+
+    </div>
+</div>

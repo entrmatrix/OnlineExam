@@ -1,0 +1,90 @@
+﻿@using PagedList.Mvc
+
+@model OnlineExam.Models.UserSearchModel
+
+@{
+    ViewBag.Title = "使用者管理";
+}
+
+
+
+<div class="row">
+
+    <div class="col-md-3">
+        <h2>
+            使用者資料共 @Model.TotalCount  筆
+        </h2>
+    </div>
+    <div>
+
+    </div>
+
+</div>
+
+@if (Model != null)
+{
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th width="50px"></th>
+                <th>#</th>
+                <th>姓名</th>
+                <th>Email</th>
+                <th>角色</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.ViewModelList.Count; i++)
+                {
+                    int order = i + 1;
+
+                    var user = Model.ViewModelList[i];
+
+                <tr>
+                    <td>
+                        
+                        <button class="btn btn-xs btn-danger">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </button>
+                      
+                    </td>
+                    <th scope="row">@order</th>
+
+                    <td> @user.Name</td>
+
+                    <td> @user.Email</td>
+
+                    @if (user.Boss)
+                    {
+
+                        <td><span class="label label-danger">老闆</span>   </td>
+                    }
+                    else if (user.Admin)
+                    {
+                        <td> <span class="label label-primary">管理員</span>  </td>
+                    }
+                    else
+                    {
+                        <td>   </td>
+                    }
+
+
+
+                </tr>
+            }
+
+
+
+        </tbody>
+
+
+    </table>
+
+
+        <br />
+
+        @Html.PagedListPager(Model.PagedUsers, page => Url.Action("Users", new { page }))
+
+}
+

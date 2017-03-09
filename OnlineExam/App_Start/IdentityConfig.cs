@@ -73,12 +73,44 @@ namespace OnlineExam
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = 
-                    new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
+                manager.UserTokenProvider =
+                    new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity")) {
+                        TokenLifespan = TimeSpan.FromHours(24)
+                    };
+                
+
             }
             return manager;
         }
     }
+   
+    public class ApplicationRoleManager : RoleManager<IdentityRole>
+    {
+        public ApplicationRoleManager(IRoleStore<IdentityRole, string> roleStore)
+            : base(roleStore)
+        {
+        }
+
+
+        public static ApplicationRoleManager Create(IdentityFactoryOptions<ApplicationRoleManager> options, IOwinContext context)
+        {
+            return new ApplicationRoleManager(new RoleStore<IdentityRole>(context.Get<ApplicationDbContext>()));
+        }
+
+        public IdentityResult CreateRole(string name)
+        {
+            var role = new IdentityRole
+            {
+                Name = name
+            };
+
+            return this.Create(role);
+
+        }
+
+    }
+
+
 
     // 設定在此應用程式中使用的應用程式登入管理員。
     public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
@@ -97,5 +129,57 @@ namespace OnlineExam
         {
             return new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
         }
+
+        public async override Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
+        {
+            var user = await UserManager.FindByNameAsync(userName);
+            if (user == null) return SignInStatus.Failure;
+
+            string userId = user.Id;
+
+            var locked = await UserManager.IsLockedOutAsync(userId);
+            if (locked) return SignInStatus.LockedOut;
+
+            var passwordValid = await UserManager.CheckPasswordAsync(user, password);
+            if (!passwordValid)  //密碼錯誤
+            {
+                if (shouldLockout)
+                {
+                    await UserManager.AccessFailedAsync(userId);
+                    locked = await UserManager.IsLockedOutAsync(userId);
+                    if (locked) return SignInStatus.LockedOut;
+                }
+
+                return SignInStatus.Failure;
+            }
+
+
+            //檢查Email是否驗證
+            var emailConfirmed = await UserManager.IsEmailConfirmedAsync(userId);
+            if (!emailConfirmed) return SignInStatus.RequiresVerification;
+
+            var status = await SignIn(user);
+            return status;
+
+        }
+        private async Task<SignInStatus> SignIn(ApplicationUser user)
+        {
+            await UserManager.ResetAccessFailedCountAsync(user.Id);
+
+            var userIdentity = await user.GenerateUserIdentityAsync((ApplicationUserManager)UserManager);
+
+            AuthenticationManager.SignIn(userIdentity);
+
+            return SignInStatus.Success;
+
+        }
+        //public async Task<SignInStatus> ReSign(ApplicationUser user)
+        //{
+        //    AuthenticationManager.SignOut();
+
+        //    var status = await SignIn(user);
+        //    return status;
+        //}
+
     }
 }

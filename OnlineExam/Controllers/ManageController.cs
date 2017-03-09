@@ -10,8 +10,9 @@ using OnlineExam.Models;
 
 namespace OnlineExam.Controllers
 {
+   
     [Authorize]
-    public class ManageController : Controller
+     public class ManageController : Controller
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;

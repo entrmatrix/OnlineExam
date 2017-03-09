@@ -181,6 +181,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\ExamController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -211,6 +212,10 @@
     <Compile Include="Migrations\201703080522568_20170308_2.Designer.cs">
       <DependentUpon>201703080522568_20170308_2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201703090847111_20170310_1.cs" />
+    <Compile Include="Migrations\201703090847111_20170310_1.Designer.cs">
+      <DependentUpon>201703090847111_20170310_1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Exam.cs" />
@@ -220,6 +225,7 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Option.cs" />
     <Compile Include="Models\Question.cs" />
+    <Compile Include="Models\ViewModels\UserViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ExamService.cs" />
     <Compile Include="Services\Extensions.cs" />
@@ -250,6 +256,9 @@
     <EmbeddedResource Include="Migrations\201703080522568_20170308_2.resx">
       <DependentUpon>201703080522568_20170308_2.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703090847111_20170310_1.resx">
+      <DependentUpon>201703090847111_20170310_1.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\PublishProfiles\online-exam - FTP %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\online-exam - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\online-exam - Web Deploy %282%29.pubxml" />
@@ -271,8 +280,10 @@
     <Content Include="Scripts\site.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Views\Shared\EmailTemplates\PasswordMail.html" />
+    <Content Include="Views\Shared\EmailTemplates\PasswordMailText.txt" />
     <Content Include="Views\Shared\EmailTemplates\RegisterMail.html" />
     <Content Include="Views\Shared\EmailTemplates\RegisterMailText.txt" />
+    <Content Include="Views\Shared\PasswordMail.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -290,17 +301,13 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
-    <Content Include="Views\Account\ConfirmEmail.cshtml" />
     <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
     <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
     <Content Include="Views\Account\ForgotPassword.cshtml" />
-    <Content Include="Views\Account\ForgotPasswordConfirmation.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\ResetPassword.cshtml" />
     <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
-    <Content Include="Views\Account\SendCode.cshtml" />
-    <Content Include="Views\Account\VerifyCode.cshtml" />
     <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Manage\Index.cshtml" />
@@ -315,6 +322,11 @@
     <Content Include="Views\Exam\Details.cshtml" />
     <Content Include="Views\Manage\Manage.cshtml" />
     <Content Include="Views\Manage\Profiles.cshtml" />
+    <Content Include="Views\Account\RegisterConfirm.cshtml" />
+    <Content Include="Views\Account\RegisterInstruction.cshtml" />
+    <Content Include="Views\Account\NeedRegisterConfirm.cshtml" />
+    <Content Include="Views\Account\ForgotPasswordInstruction.cshtml" />
+    <Content Include="Views\Admin\Users.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

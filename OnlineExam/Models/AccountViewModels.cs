@@ -89,6 +89,8 @@ namespace OnlineExam.Models
         public string ConfirmPassword { get; set; }
     }
 
+    
+
     public class ResetPasswordViewModel
     {
         [Required]

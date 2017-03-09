@@ -13,6 +13,7 @@ using OnlineExam.Services;
 using System.Configuration;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace OnlineExam.Controllers
 {
@@ -21,18 +22,19 @@ namespace OnlineExam.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationRoleManager _roleManager;
 
         private SendGridEmailService emailService;
 
         public AccountController()
         {
-            string sendGridApiKey= ConfigurationManager.AppSettings["sendGridApiKey"];
+            string sendGridApiKey = ConfigurationManager.AppSettings["sendGridApiKey"];
             string sender = "service@online-exam.com";
             string senderName = ConfigurationManager.AppSettings["siteName"];
             this.emailService = new SendGridEmailService(sendGridApiKey, sender, senderName);
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -44,9 +46,9 @@ namespace OnlineExam.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -62,11 +64,38 @@ namespace OnlineExam.Controllers
             }
         }
 
+        public ApplicationRoleManager RoleManager
+        {
+            get
+            {
+                return _roleManager ?? HttpContext.GetOwinContext().Get<ApplicationRoleManager>();
+            }
+            private set
+            {
+                _roleManager = value;
+            }
+        }
+
+
         //
         // GET: /Account/Login
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
+            //RoleManager.Create(new IdentityRole { Name = "Boss" });
+
+            //RoleManager.CreateRole("Boss");
+            //RoleManager.CreateRole("Admin");
+
+
+            var user = UserManager.FindByEmail("traders.com.tw@gmail.com");
+
+            
+
+
+
+
+
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
@@ -78,10 +107,7 @@ namespace OnlineExam.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
+            if (!ModelState.IsValid) return View(model);
 
             // 這不會計算為帳戶鎖定的登入失敗
             // 若要啟用密碼失敗來觸發帳戶鎖定，請變更為 shouldLockout: true
@@ -93,7 +119,11 @@ namespace OnlineExam.Controllers
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+
+                    //需要Email驗證
+                    var user = await UserManager.FindByNameAsync(model.Email);
+                    return View("NeedRegisterConfirm", user);
+
                 case SignInStatus.Failure:
                 default:
                     ModelState.AddModelError("", "登入嘗試失試。");
@@ -101,48 +131,7 @@ namespace OnlineExam.Controllers
             }
         }
 
-        //
-        // GET: /Account/VerifyCode
-        [AllowAnonymous]
-        public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
-        {
-            // 需要使用者已透過使用者名稱/密碼或外部登入進行登入
-            if (!await SignInManager.HasBeenVerifiedAsync())
-            {
-                return View("Error");
-            }
-            return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
-        }
-
-        //
-        // POST: /Account/VerifyCode
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> VerifyCode(VerifyCodeViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            // 下列程式碼保護兩個因素碼不受暴力密碼破解攻擊。 
-            // 如果使用者輸入不正確的代碼來表示一段指定的時間，則使用者帳戶 
-            // 會有一段指定的時間遭到鎖定。 
-            // 您可以在 IdentityConfig 中設定帳戶鎖定設定
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    return RedirectToLocal(model.ReturnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "代碼無效。");
-                    return View(model);
-            }
-        }
+       
 
         //
         // GET: /Account/Register
@@ -166,16 +155,15 @@ namespace OnlineExam.Controllers
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 user.Name = model.Name;
                 user.Gender = model.Gender;
+                user.CreateDate = DateTime.Now;
 
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-
                     //發送Email認證信
                     await SendRegisterConfirmEmail(user);
 
-                    return RedirectToAction("Index", "Home");
+                    return View("RegisterInstruction", user);
                 }
                 AddErrors(result);
             }
@@ -187,7 +175,7 @@ namespace OnlineExam.Controllers
         async Task SendRegisterConfirmEmail(ApplicationUser user)
         {
             string siteName = ConfigurationManager.AppSettings["siteName"];
-            string title = String.Format("{0} 會員註冊Email認證信" , siteName);
+            string title = String.Format("{0} 會員註冊Email認證信", siteName);
             string subject = title;
             string nickName = user.Name;
 
@@ -206,78 +194,44 @@ namespace OnlineExam.Controllers
                                                         .Replace("{{ValidateUrl}}", validateUrl);
 
             string to = user.Email;
-           
+
             await emailService.SendAsync(subject, to, htmlBody, textBody);
         }
 
-        //public async Task<ActionResult> RegisterConfirm(string user, string code)
-        //{
-        //    try
-        //    {
-        //        string userId = user;
-        //        if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(code))
-        //        {
-        //            return HttpNotFound();
-        //        }
-
-        //        AppUser newUser = await UserManager.FindByIdAsync(userId);
-        //        if (newUser == null)
-        //        {
-        //            return HttpNotFound();
-        //        }
-
-        //        if (!newUser.EmailConfirmed)
-        //        {
-        //            var result = await UserManager.ConfirmEmailAsync(userId, code);
-        //            if (!result.Succeeded)
-        //            {
-        //                //無效的驗證碼
-        //                var modelConfirmFailed = new RegisterConfirmModel
-        //                {
-        //                    ConfirmOK = false,
-        //                    UserId = userId
-        //                };
-
-        //                return View(modelConfirmFailed);
-        //            }
-        //        }
-
-
-        //        //驗證成功
-        //        var modelConfirmSuccess = new RegisterConfirmModel
-        //        {
-        //            ConfirmOK = true,
-        //            UserId = userId,
-        //            NickName = userId
-        //        };
-
-        //        return View(modelConfirmSuccess);
-
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        HandleException(ex);
-        //        return ErrorPage();
-        //    }
-
-
-        //}
-
-
-        //
-        // GET: /Account/ConfirmEmail
         [AllowAnonymous]
-        public async Task<ActionResult> ConfirmEmail(string userId, string code)
+        public async Task<ActionResult> RegisterConfirm(string user, string code)
         {
-            if (userId == null || code == null)
+            string userId = user;
+
+            var newUser = await UserManager.FindByIdAsync(userId);
+            if (newUser == null)
             {
-                return View("Error");
+                return HttpNotFound();
             }
-            var result = await UserManager.ConfirmEmailAsync(userId, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+
+            if (!newUser.EmailConfirmed)
+            {
+                await UserManager.ConfirmEmailAsync(userId, code);
+            }
+
+            return View(newUser);
+
         }
 
+
+        //使用者申請重發驗證信
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        public async Task<ActionResult> SendRegisterConfirmMail(ApplicationUser model)
+        {
+            var user = UserManager.FindById(model.Id);
+
+            //發送email驗證信
+            await SendRegisterConfirmEmail(user);
+
+            return View("RegisterInstruction", user);
+        }
         //
         // GET: /Account/ForgotPassword
         [AllowAnonymous]
@@ -298,20 +252,53 @@ namespace OnlineExam.Controllers
                 var user = await UserManager.FindByNameAsync(model.Email);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
+                    user = new ApplicationUser()
+                    {
+                        Email = model.Email,
+                        Name = ""
+                    };
+                   
                     // 不顯示使用者不存在或未受確認
-                    return View("ForgotPasswordConfirmation");
+                    return View("ForgotPasswordInstruction", user);
                 }
 
-                // 如需如何啟用帳戶確認和密碼重設的詳細資訊，請造訪 http://go.microsoft.com/fwlink/?LinkID=320771
-                // 傳送包含此連結的電子郵件
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                // await UserManager.SendEmailAsync(user.Id, "重設密碼", "請按 <a href=\"" + callbackUrl + "\">這裏</a> 重設密碼");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                await SendResetPasswordEmail(user);
+
+                return View("ForgotPasswordInstruction", user);
+              
             }
 
             // 如果執行到這裡，發生某項失敗，則重新顯示表單
             return View(model);
+        }
+
+        private async Task SendResetPasswordEmail(ApplicationUser user)
+        {
+            string siteName = ConfigurationManager.AppSettings["siteName"];
+            
+            string subject = String.Format("{0} 忘記密碼回函", siteName);
+            string title = String.Format("{0} 忘記密碼小幫手", siteName);
+            string nickName = user.Name;
+
+            string userId = user.Id;
+            string code = await UserManager.GeneratePasswordResetTokenAsync(userId);
+            var validateUrl = Url.Action("ResetPassword", "Account", new { user = userId, code = code }, protocol: Request.Url.Scheme);
+
+            string mailHtmlTemplate = System.IO.File.ReadAllText(Server.MapPath("~/Views/Shared/EmailTemplates/PasswordMail.html"));
+
+            string htmlBody = mailHtmlTemplate.Replace("{{TitleText}}", title).Replace("{{UserName}}", nickName)
+                                                        .Replace("{{ValidateUrl}}", validateUrl);
+
+            string textTemplate = System.IO.File.ReadAllText(Server.MapPath("~/Views/Shared/EmailTemplates/PasswordMailText.txt"));
+
+            string textBody = textTemplate.Replace("{{TitleText}}", title).Replace("{{UserName}}", nickName)
+                                                        .Replace("{{ValidateUrl}}", validateUrl);
+
+            string to = user.Email;
+
+            await emailService.SendAsync(subject, to, htmlBody, textBody);
+
+
         }
 
         //
@@ -325,9 +312,18 @@ namespace OnlineExam.Controllers
         //
         // GET: /Account/ResetPassword
         [AllowAnonymous]
-        public ActionResult ResetPassword(string code)
+        public async Task<ActionResult>  ResetPassword(string user, string code)
         {
-            return code == null ? View("Error") : View();
+            var theUser = await UserManager.FindByIdAsync(user);
+            if (theUser == null) return HttpNotFound();
+
+            var model = new ResetPasswordViewModel()
+            {
+                Code = code
+            };
+
+            return View(model);
+           
         }
 
         //
@@ -375,40 +371,7 @@ namespace OnlineExam.Controllers
             return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
         }
 
-        //
-        // GET: /Account/SendCode
-        [AllowAnonymous]
-        public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
-        {
-            var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId == null)
-            {
-                return View("Error");
-            }
-            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
-            var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
-            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
-        }
-
-        //
-        // POST: /Account/SendCode
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SendCode(SendCodeViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View();
-            }
-
-            // 產生並傳送 Token
-            if (!await SignInManager.SendTwoFactorCodeAsync(model.SelectedProvider))
-            {
-                return View("Error");
-            }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
-        }
+       
 
         //
         // GET: /Account/ExternalLoginCallback
