@@ -28,10 +28,9 @@ namespace OnlineExam.Controllers
 
         public AccountController()
         {
-            string sendGridApiKey = ConfigurationManager.AppSettings["sendGridApiKey"];
             string sender = "service@online-exam.com";
             string senderName = ConfigurationManager.AppSettings["siteName"];
-            this.emailService = new SendGridEmailService(sendGridApiKey, sender, senderName);
+            this.emailService = new SendGridEmailService(sender, senderName);
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
@@ -82,20 +81,6 @@ namespace OnlineExam.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
-            //RoleManager.Create(new IdentityRole { Name = "Boss" });
-
-            //RoleManager.CreateRole("Boss");
-            //RoleManager.CreateRole("Admin");
-
-
-            var user = UserManager.FindByEmail("traders.com.tw@gmail.com");
-
-            
-
-
-
-
-
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }

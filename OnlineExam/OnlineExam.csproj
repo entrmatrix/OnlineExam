@@ -216,6 +216,14 @@
     <Compile Include="Migrations\201703090847111_20170310_1.Designer.cs">
       <DependentUpon>201703090847111_20170310_1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201703101456021_exam_userId.cs" />
+    <Compile Include="Migrations\201703101456021_exam_userId.Designer.cs">
+      <DependentUpon>201703101456021_exam_userId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703101513598_20170311_2.cs" />
+    <Compile Include="Migrations\201703101513598_20170311_2.Designer.cs">
+      <DependentUpon>201703101513598_20170311_2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Exam.cs" />
@@ -238,6 +246,7 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\PagedList.css" />
+    <Content Include="Content\sweetalert.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -259,6 +268,13 @@
     <EmbeddedResource Include="Migrations\201703090847111_20170310_1.resx">
       <DependentUpon>201703090847111_20170310_1.cs</DependentUpon>
     </EmbeddedResource>
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <EmbeddedResource Include="Migrations\201703101456021_exam_userId.resx">
+      <DependentUpon>201703101456021_exam_userId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703101513598_20170311_2.resx">
+      <DependentUpon>201703101513598_20170311_2.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\PublishProfiles\online-exam - FTP %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\online-exam - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\online-exam - Web Deploy %282%29.pubxml" />
@@ -278,6 +294,7 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\site.js" />
+    <Content Include="Scripts\sweetalert-dev.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Views\Shared\EmailTemplates\PasswordMail.html" />
     <Content Include="Views\Shared\EmailTemplates\PasswordMailText.txt" />

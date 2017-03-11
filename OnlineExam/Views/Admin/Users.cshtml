@@ -1,4 +1,5 @@
 ﻿@using PagedList.Mvc
+@using OnlineExam.Services
 
 @model OnlineExam.Models.UserSearchModel
 
@@ -6,85 +7,335 @@
     ViewBag.Title = "使用者管理";
 }
 
+<div id="divUsers">
+
+    @{
+
+        var ajaxOptions = new AjaxOptions
+        {
+            HttpMethod = "POST",
+            UpdateTargetId = "divUsers",
+            InsertionMode = InsertionMode.ReplaceWith
+        };
+     }
+
+    @using (Ajax.BeginForm("Users", "Admin", null, ajaxOptions, new { @id = "formSearch" }))
+    {
+        <div class="row">
+
+            <div class="col-md-4">
+                <h2>
+                    使用者資料共 @Model.TotalCount  筆
+                </h2>
+            </div>
+
+            <div class="col-md-4 form-inline">
+                <div style="margin-top:15px;">
+                    @Html.TextBoxFor(m => m.Keyword, new { @class = "form-control", @style = "width:100%" })
+                    <button id="btnSearch" class="btn btn-default">搜尋</button>
+                    @Html.HiddenFor(m => m.PageNumber)
+                </div>
+            </div>
+
+        </div>
+    }
+
+    @if (Request.IsAjaxRequest())
+    {
+        
+        <script type="text/javascript">
+
+            bookBtnSearchClick();
+
+        </script>
+       
+
+   }
 
 
-<div class="row">
+    @if (!Model.ViewModelList.IsNullOrEmpty())
+    {
 
-    <div class="col-md-3">
-        <h2>
-            使用者資料共 @Model.TotalCount  筆
-        </h2>
-    </div>
-    <div>
-
-    </div>
-
-</div>
-
-@if (Model != null)
-{
-
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th width="50px"></th>
-                <th>#</th>
-                <th>姓名</th>
-                <th>Email</th>
-                <th>角色</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.ViewModelList.Count; i++)
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th width="50px"></th>
+                    <th>#</th>
+                    <th>姓名</th>
+                    <th>Email</th>
+                    <th>加入日期</th>
+                    <th>角色</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.ViewModelList.Count; i++)
                 {
                     int order = i + 1;
 
                     var user = Model.ViewModelList[i];
 
-                <tr>
-                    <td>
-                        
-                        <button class="btn btn-xs btn-danger">
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                        </button>
-                      
-                    </td>
-                    <th scope="row">@order</th>
+                    <tr>
+                        <td>
 
-                    <td> @user.Name</td>
+                            <button class="btn btn-xs btn-danger">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true" data-id="@user.Id" data-name="@user.Name"></span>
+                            </button>
 
-                    <td> @user.Email</td>
+                        </td>
+                        <th scope="row">@order</th>
 
-                    @if (user.Boss)
-                    {
+                        <td> @user.Name</td>
 
-                        <td><span class="label label-danger">老闆</span>   </td>
-                    }
-                    else if (user.Admin)
-                    {
-                        <td> <span class="label label-primary">管理員</span>  </td>
-                    }
-                    else
-                    {
-                        <td>   </td>
-                    }
+                        <td> @user.Email</td>
+
+                        <td> @user.CreateDate.ToDateTimeString()</td>
+                        <td>
+                            @if (user.Boss)
+                            {
+                                
+                                    <span class="label label-danger">老闆</span>
+                                
+
+                            }
+                            else if (user.Admin)
+                            {
+                                <span class="label label-primary">管理員</span>
+
+                                if (Model.CanUpdateRole)
+                                {
+                                    <button class="btn btn-xs btn-warning">
+                                        <span class="glyphicon glyphicon-minus" data-id="@user.Id" aria-hidden="true"></span>
+                                    </button>
+                                }
+
+                            }
+                            else
+                            {
+
+                                if (Model.CanUpdateRole)
+                                {
+                                    <button class="btn btn-xs btn-info">
+                                        <span class="glyphicon glyphicon-plus" data-id="@user.Id" aria-hidden="true"></span>
+                                    </button>
+                                }
 
 
 
-                </tr>
-            }
+                            }
+
+
+                         </td>
+
+                    </tr>
+                }
 
 
 
-        </tbody>
+            </tbody>
 
 
-    </table>
+        </table>
 
 
         <br />
 
-        @Html.PagedListPager(Model.PagedUsers, page => Url.Action("Users", new { page }))
+        ajaxOptions.HttpMethod = "GET";
+        var renderOptions = PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(ajaxOptions);
+
+        @Html.PagedListPager(Model.PagedUsers, page => Url.Action("Users", new { page = page, keyword = Model.Keyword }) , renderOptions)
+
+
+
+
+        ajaxOptions = new AjaxOptions
+        {
+            HttpMethod = "POST",
+            OnBegin= "Loading",
+            OnComplete= "EndLoading",
+            OnSuccess= "successDeleteUser",
+            OnFailure= "failedDeleteUser",
+
+        };
+
+        using (Ajax.BeginForm("DeleteUser", "Admin", null, ajaxOptions, new { @id = "fromDeleteUser" }))
+        {
+               @Html.AntiForgeryToken()
+
+               @Html.HiddenFor(m=>m.UserId)
+             
+         }
+
+
+        if (Request.IsAjaxRequest())
+        {
+            <script type="text/javascript">
+
+                bookBtnSearchClick();
+                
+                bookBtnDeleteClick();
+
+                bookBtnPlusRoleClick();
+
+                bookBtnMinusRoleClick();
+
+            </script>
+        }
+
+
+
+
+
+
+
+    }
+
+
+</div>
+
+@if (!Request.IsAjaxRequest())
+{
+
+    @section scripts{
+
+        <script type="text/javascript">
+
+        function submitSearch() {
+            $('#formSearch').submit();
+        }
+
+        function submitDelete() {
+            $('#fromDeleteUser').submit();
+        }
+
+
+
+        function failedDeleteUser() {
+            swal({
+                title: "刪除失敗",
+                type: "error",
+            });
+        }
+
+        function successDeleteUser(data) {
+            if (data.Success == true) {
+                swal({
+                    title: "刪除成功",
+                    type: "success",
+                });
+                submitSearch();
+
+            } else {
+                var msg = data.Msg;
+                swal({
+                    title: "刪除失敗",
+                    text: msg,
+                    type: "error",
+
+                });
+
+            }
+        }
+
+        function updateRole(id , add) {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            $.ajax({
+                url: '@Url.Action("UpdateUserRole", "Admin")',
+                type: 'POST',
+                data: {
+                    __RequestVerificationToken: token,
+                    id: id,
+                    add:add
+                },
+                success: function (data) {
+                    if (data.Success == true) {
+                        swal({
+                            title: "更新角色成功",
+                            type: "success",
+                        });
+                        submitSearch();
+
+                    } else {
+                        var msg = data.Msg;
+                        swal({
+                            title: "更新角色失敗",
+                            text: msg,
+                            type: "error",
+
+                        });
+
+                    }
+                },
+                error: function () {
+                    swal({
+                        title: "更新角色失敗",
+                        type: "error",
+                    });
+                }
+
+            });
+        }
+
+        function bookBtnDeleteClick() {
+            $('.glyphicon-trash').click(function () {
+                var id = $(this).data('id');
+                var name = $(this).data('name');
+                $('#@Html.IdFor(m=>m.UserId)').val(id);
+
+                swal({
+                    title: "警告",
+                    text: "確定要刪除 " + name + " 嗎?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "確認刪除",
+                    cancelButtonText: "取消",
+                    closeOnConfirm: false
+                },
+                function () {
+                    submitDelete();
+                });
+            })
+        }
+
+        function bookBtnPlusRoleClick() {
+            $('.glyphicon-plus').click(function () {
+                var id = $(this).data('id');
+                updateRole(id, true);
+            });
+        }
+        function bookBtnMinusRoleClick() {
+            $('.glyphicon-minus').click(function () {
+                var id = $(this).data('id');
+                updateRole(id, false);
+            });
+        }
+
+        function bookBtnSearchClick() {
+            $('#btnSearch').click(function (e) {
+                e.preventDefault();
+
+                $('#@Html.IdFor(m=>m.PageNumber)').val("1");
+                submitSearch();
+            });
+        }
+
+        $(document).ready(function () {
+
+            bookBtnSearchClick();
+
+            bookBtnDeleteClick();
+
+            bookBtnPlusRoleClick();
+
+            bookBtnMinusRoleClick();
+        })
+
+        </script>
+
+
+    }
+
 
 }
 

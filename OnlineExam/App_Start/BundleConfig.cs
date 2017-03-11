@@ -27,10 +27,12 @@ namespace OnlineExam
 
             bundles.Add(new ScriptBundle("~/bundles/site").Include(
                     "~/Scripts/site.js",
-                    "~/Scripts/jquery.isloading.js"));
+                    "~/Scripts/jquery.isloading.js",
+                    "~/Scripts/sweetalert-dev.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap-lumen.css",
+                       "~/Content/sweetalert.css",
                       "~/Content/site.css"));
         }
     }

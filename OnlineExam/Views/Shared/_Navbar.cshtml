@@ -1,4 +1,10 @@
-﻿<div class="navbar navbar-inverse navbar-fixed-top">
+﻿@using Microsoft.AspNet.Identity
+
+@{ 
+    bool admin = User.IsInRole("Admin");
+}
+
+<div class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -19,6 +25,15 @@
                 <li>@Html.ActionLink("測驗紀錄", "Index", "Exam")</li>
                
             </ul>
+
+            @if (User.IsInRole("Admin") || User.IsInRole("Boss"))
+            {
+                <ul class="nav navbar-nav" style="width:50%;text-align:center">
+                    <li style="float:none;display:inline-block">@Html.ActionLink("使用者管理", "Users", "Admin")</li>
+
+                </ul>
+            }         
+            
             @Html.Partial("_LoginPartial")
         </div>
     </div>

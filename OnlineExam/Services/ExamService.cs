@@ -158,5 +158,18 @@ namespace OnlineExam.Services
 
             return exam;
         }
+
+        public void DeleteNonUserExamRecords()
+        {
+            var records = context.Exams.Where(e => e.UserId == null).ToList();
+
+            foreach (var item in records)
+            {
+                context.Exams.Remove(item);
+            }
+
+            context.SaveChanges();
+        }
+
     }
 }

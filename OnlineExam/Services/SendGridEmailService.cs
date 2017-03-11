@@ -18,9 +18,13 @@ namespace OnlineExam.Services
         public string Sender { get; set; }
         public string SenderName { get; set; }
 
-        public SendGridEmailService(string key, string sender, string senderName)
+        public SendGridEmailService(string sender, string senderName)
         {
-            this.sendGridApiKey = key;
+            //Azure
+            this.sendGridApiKey = System.Environment.GetEnvironmentVariable("sendGridApiKey");
+
+            //Local
+            // this.sendGridApiKey = System.Configuration.ConfigurationManager.AppSettings["sendGridApiKey"];
             Sender = sender;
             SenderName = senderName;
 

@@ -12,6 +12,14 @@ namespace OnlineExam.Models
 
         public int TotalCount { get; set; }
 
+        public int PageNumber { get; set; }
+
+        public int PageSize { get; set; }
+
+        public string UserId { get; set; }
+
+        public bool CanUpdateRole { get; set; }
+
         public IPagedList<ApplicationUser> PagedUsers { get; set; }
 
         public IList<UserViewModel> ViewModelList { get; set; }
@@ -23,6 +31,7 @@ namespace OnlineExam.Models
         public string Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
+        public DateTime  CreateDate { get; set; }
 
         public bool Boss { get; set; }
         public bool Admin { get; set; }
@@ -32,6 +41,7 @@ namespace OnlineExam.Models
             Id = user.Id;
             Name = user.Name;
             Email = user.Email;
+            CreateDate = user.CreateDate;
         }
     }
 }

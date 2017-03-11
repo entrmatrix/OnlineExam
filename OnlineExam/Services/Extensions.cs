@@ -20,6 +20,19 @@ namespace OnlineExam.Services
             return !collection.Any();
 
         }
+        public static int MaxPage<T>(this IEnumerable<T> enumerable, int pageSize)
+        {
+            if (enumerable.IsNullOrEmpty()) return 0;
+
+            return (int)Math.Ceiling((double)enumerable.Count() / pageSize);
+        }
+
+
+        public static string ToDateTimeString(this DateTime datetime)
+        {
+            return datetime.ToString("yyyy/MM/dd HH:mm:ss");
+
+        }
 
        
     }

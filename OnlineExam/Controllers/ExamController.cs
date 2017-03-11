@@ -24,7 +24,14 @@ namespace OnlineExam.Controllers
             this.examService = new ExamService(context);
         }
 
-        string UserId{ get{ return User.Identity.GetUserId(); } }
+        string UserId
+        {
+            get
+            {
+                return User.Identity.GetUserId();
+            }
+
+        }
 
 
         // GET: Exam
@@ -36,7 +43,7 @@ namespace OnlineExam.Controllers
             if (records.IsNullOrEmpty())
             {
                 ViewBag.Count = 0;
-                ViewBag.Average = "--";
+                ViewBag.Average = -1;
 
                 return View();
             }

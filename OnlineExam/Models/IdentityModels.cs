@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
+using System.Collections.Generic;
 
 namespace OnlineExam.Models
 {
@@ -15,6 +16,9 @@ namespace OnlineExam.Models
         public bool Gender { get; set; }
 
         public DateTime CreateDate { get; set; }
+
+
+        public virtual ICollection<Exam> Exams { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {

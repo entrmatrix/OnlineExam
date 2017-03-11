@@ -1,4 +1,4 @@
-namespace OnlineExam.Migrations
+﻿namespace OnlineExam.Migrations
 {
     using Models;
     using System;
@@ -6,33 +6,71 @@ namespace OnlineExam.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
     using System.Xml;
+    using Microsoft.AspNet.Identity.EntityFramework;
+    using Microsoft.AspNet.Identity;
+    using OnlineExam;
+    using System.Text;
 
     internal sealed class Configuration : DbMigrationsConfiguration<OnlineExam.Models.ApplicationDbContext>
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
+            
         }
 
         protected override void Seed(OnlineExam.Models.ApplicationDbContext context)
         {
-           
+
+            var roleStore = new RoleStore<IdentityRole>(context);
+            var roleManager = new ApplicationRoleManager(roleStore);
+
+            string roleName = "Boss";
+            var role = roleManager.FindByName(roleName);
+            if (role == null) roleManager.CreateRole(roleName);
+
+            roleName = "Admin";
+            role = roleManager.FindByName(roleName);
+            if (role == null) roleManager.CreateRole(roleName);
+
+
+            var userStore = new UserStore<ApplicationUser>(context);
+            var userManager = new ApplicationUserManager(userStore);
+
+          
+
+            string email = "traders.com.tw@gmail.com";
+            var exist = userManager.FindByEmail(email);
+            if (exist == null)
+            {
+                string password = "000000";
+                var boss = new ApplicationUser
+                {
+                    Name="何金水",
+                    Email = email,
+                    UserName = email,
+                    CreateDate = DateTime.Now,
+                    Gender = true,
+                };
+                var result = userManager.Create(boss, password);
+                if (result.Succeeded)
+                {
+                    userManager.AddToRole(boss.Id, "Boss");
+                }
+            }
+            else
+            {
+                userManager.AddToRole(exist.Id, "Boss");
+            }
+
+
             CreateQuestions(context);
 
 
-            //  This method will be called after migrating to the latest version.
-
-            //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
-            //  to avoid creating duplicate seed data. E.g.
-            //
-            //    context.People.AddOrUpdate(
-            //      p => p.FullName,
-            //      new Person { FullName = "Andrew Peters" },
-            //      new Person { FullName = "Brice Lambson" },
-            //      new Person { FullName = "Rowan Miller" }
-            //    );
-            //
         }
+
+
+
 
         void CreateQuestions(OnlineExam.Models.ApplicationDbContext context)
         {
@@ -41,7 +79,7 @@ namespace OnlineExam.Migrations
             var resourceName = "OnlineExam.App_Data.Questions.xml";
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var stream = assembly.GetManifestResourceStream(resourceName);
-           
+
 
             doc.Load(stream);
 
@@ -51,7 +89,7 @@ namespace OnlineExam.Migrations
             XmlNode root = doc.DocumentElement;
 
             if (root.Name != rootName) throw new Exception("wrong root Name. root name should be: " + rootName);
-         
+
 
             foreach (XmlNode node in root.ChildNodes)
             {
@@ -61,7 +99,7 @@ namespace OnlineExam.Migrations
             context.SaveChanges();
 
         }
-        void AddQuestions(XmlNode node , OnlineExam.Models.ApplicationDbContext context)
+        void AddQuestions(XmlNode node, OnlineExam.Models.ApplicationDbContext context)
         {
             var nodeContent = node.SelectSingleNode("Content");
             string content = nodeContent.InnerText;
@@ -73,7 +111,7 @@ namespace OnlineExam.Migrations
             string answer = nodeAnswer.InnerText;
             if (String.IsNullOrEmpty(answer)) return;
 
-          var options = GetOptions(node,context);
+            var options = GetOptions(node, context);
 
             var question = new Question
             {
@@ -81,7 +119,7 @@ namespace OnlineExam.Migrations
                 Answer = answer,
                 Options = options
             };
-             
+
             context.Questions.Add(question);
 
         }
